@@ -24,27 +24,27 @@ const boxSpeed = 10;
 var box = {
     x:300,
     y:580,
-    height:40,
-    width:40,
-    color:"white",
+    height:50,
+    width:50,
+    color:"Yellow",
     score:0,
-    lives:5,
+    lives:3,
 }
 var ball = {
     x:40,
     y:40,
-    radios:10,
+    radios:12.5,
     speed:5,
     realSpeed:6,
-    color:"white",
+    color:"Olive",
 }
 var ball_1 = {
     x:70,
     y:-500,
-    radios:10,
+    radios:12.5,
     speed:5,
     realSpeed:6,
-    color:"white",
+    color:"Olive",
 }
 function calculateMousePos(evt){
     var rect = canvas.getBoundingClientRect();
@@ -58,13 +58,14 @@ function calculateMousePos(evt){
 }
 window.onload = function(){
     canvas = document.getElementById("canvas");
-    ctx = canvas.getContext("2d");
-    ball.x = myNum(canvas.width)
-    ball_1.x = myNum(canvas.width)
+    document.getElementById("myImg");
+    ctx = canvas.getContext('2d');
+    ball.x = myNum(canvas.width -50) + 50
+    ball_1.x = myNum(canvas.width -50) + 50
     var fps = 60;
     setInterval (function (){
-    draw()
     move();
+    draw()
     },1000/fps);
     canvas.addEventListener('mousemove',
     function(evt){
@@ -106,12 +107,17 @@ function move(){
             box.score++
         }
     }
-    box.x = mouseX
+    if (mouseX < box.x){
+    box.x = mouseX + box.width/2
+    } if (mouseX > box.x){
+    box.x = mouseX - box.width/2
+    }
 }
 }
 function ballReset(){
     ball.y = 0;
     ball.x = myNum(canvas.width - 50) + 50;
+    ball.speed += ball.realSpeed
     ball.speed = myNum(ball.realSpeed) + ball.realSpeed - 4;
     if (maxScore < box.score){
         maxScore = box.score;
@@ -123,6 +129,7 @@ function ballReset(){
 function ball_1Reset(){
         ball_1.y = myNum(-1000) - 500;
         ball_1.x = myNum(canvas.width - 50) + 50;
+        ball_1.speed += ball_1.realSpeed
         ball_1.speed = myNum(ball_1.realSpeed) + ball_1.realSpeed - 4;
         if (maxScore < box.score){
             maxScore = box.score;
@@ -164,23 +171,23 @@ function hanleMouseClick(evt){
         previosMaxScore = maxScore;
 }
 function draw(){
-    colorRect(0,0,canvas.width,canvas.height,"black")
+    ctx.drawImage(myImg,0,0,canvas.width,canvas.height)
     if (showWinScreen){
         colorText("play",canvas.width/2 - 50,500,"40px Arial","white")
         if (box.score < previosMaxScore){
-        colorText("score: " + box.score ,canvas.width/2 - 70,50,"30px Arial","red")
-        colorText("Max Score: " + maxScore,canvas.width/2 - 70,300,"32px Arial","darkRed")
+        colorText("score: " + box.score ,canvas.width/2 - 70,50,"30px Arial","Tomato")
+        colorText("Max Score: " + maxScore,canvas.width/2 - 70,150,"32px Arial","FireBrick")
     }else if (box.score > previosMaxScore){
-        colorText("score: " + box.score ,canvas.width/2 - 70,50,"30px Arial","green")
-        colorText("Max Score: " + maxScore,canvas.width/2 - 70,300,"32px Arial","darkGreen")
+        colorText("score: " + box.score ,canvas.width/2 - 70,50,"30px Arial","Lime")
+        colorText("Max Score: " + maxScore,canvas.width/2 - 70,150,"32px Arial","SpringGreen")
     }
         return;
     }
     colorCircle(ball.x,ball.y,ball.radios,ball.color)
     colorCircle(ball_1.x,ball_1.y,ball_1.radios,ball_1.color)
     colorRect(box.x ,box.y,box.width,box.height,box.color)
-    colorText("score: " + box.score,20,50,"30px Arial","green")
-    colorText("lives: " + box.lives,canvas.width - 100,50,"30px Arial","red")
+    colorText("score: " + box.score,20,50,"30px Arial","Lime")
+    colorText("lives: " + box.lives,canvas.width - 100,50,"30px Arial","#ff1a1a")
 }
 function colorRect(x,y,width,height,color){
     ctx.fillStyle = color
