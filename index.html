@@ -1,36 +1,34 @@
-  
-<html>
-<head>
-  <title>ball catch</title>
-    <style> 
-        canvas{
-            border: solid 1px #000;   
-        }
-    
-    </style>
-
-
-</head>
-
-<body>
-    <canvas id = "canvas" width = "600" height = "640" ></canvas>
-    <script> var canvas;
+var canvas;
 var ctx;
 var mouseX;
-const boxSpeed = 3;
+var showWinScreen = false
+var speed = 3;
+var maxScore = 0
+var previosMaxScore = 0
+const boxSpeed = 10;
 var box = {
     x:300,
-    y:600,
+    y:580,
     height:40,
     width:40,
     color:"white",
-    score:0
+    score:0,
+    lives:5,
 }
 var ball = {
     x:40,
     y:40,
     radios:10,
     speed:5,
+    realSpeed:6,
+    color:"white",
+}
+var ball_1 = {
+    x:70,
+    y:-500,
+    radios:10,
+    speed:5,
+    realSpeed:6,
     color:"white",
 }
 function calculateMousePos(evt){
@@ -47,6 +45,7 @@ window.onload = function(){
     canvas = document.getElementById("canvas");
     ctx = canvas.getContext("2d");
     ball.x = myNum(canvas.width)
+    ball_1.x = myNum(canvas.width)
     var fps = 60;
     setInterval (function (){
     draw()
@@ -57,6 +56,7 @@ window.onload = function(){
         var mousePos = calculateMousePos(evt);
         mouseX = mousePos.x;
     })
+    canvas.addEventListener('mousedown' ,hanleMouseClick)
 }
 
 function myNum(n){
@@ -64,30 +64,108 @@ function myNum(n){
  }
  console.log()
 function move(){
-    ball.y += ball.speed
+    if (!showWinScreen){
+    ball.y += ball.speed/2;
+    ball.speed += 0.2;
+    ball_1.y += ball_1.speed/2;
+    ball_1.speed += 0.05;
     if (ball.y > canvas.height){
-        ball.y = 0
-        ball.x = myNum(canvas.width)
-        ball.speed = myNum(6)+2
-    }  
+        ballReset()
+        box.lives -= 1 
+    }
     if (ball.y > box.y){
         if (ball.x > box.x && ball.x < box.x + box.width) {
-            ball.x = 300
-            ball.y = 10 
+            ballReset()
+            ball.realSpeed += 0.25;
             box.score++
         }
-    }else{}
-    if (mouseX < box.x){
-        box.x -= boxSpeed
-    }if (mouseX > box.x){
-        box.x += boxSpeed
     }
+    if (ball_1.y > canvas.height){
+        ball_1Reset()
+        box.lives -= 1 
+    }
+    if (ball_1.y > box.y){
+        if (ball_1.x > box.x && ball_1.x < box.x + box.width) {
+            ball_1Reset()
+            ball_1.realSpeed += 0.25;
+            box.score++
+        }
+    }
+    box.x = mouseX
+}
+}
+function ballReset(){
+    ball.y = 0;
+    ball.x = myNum(canvas.width - 50) + 50;
+    ball.speed = myNum(ball.realSpeed) + ball.realSpeed - 4;
+    if (maxScore < box.score){
+        maxScore = box.score;
+    }
+    if (box.lives < 1){
+        showWinScreen = true;
+    }
+}
+function ball_1Reset(){
+        ball_1.y = myNum(-1000) - 500;
+        ball_1.x = myNum(canvas.width - 50) + 50;
+        ball_1.speed = myNum(ball_1.realSpeed) + ball_1.realSpeed - 4;
+        if (maxScore < box.score){
+            maxScore = box.score;
+        }
+        if (box.lives < 1){
+            showWinScreen = true;
+        }
+}
+function reset(){
+    ball.y = 0;
+    ball.x = myNum(canvas.width - 50) + 50;
+    ball.speed = myNum(ball.realSpeed) + ball.realSpeed - 4;
+    ball_1.y = myNum(-100) - 50;
+    ball_1.x = myNum(canvas.width - 50) + 50;
+    ball_1.speed = myNum(ball_1.realSpeed) + ball_1.realSpeed - 4;
+        if (maxScore < box.score){
+            maxScore = box.score;
+        }
+        if (box.lives < 1){
+            showWinScreen = true;
+        }
+}
+
+function scoreReset(){
+    box.score = 0;
+    ball.speed = speed;
+    ball.realSpeed = speed;
+    ball_1.realSpeed = speed;
+    ball_1.speed = speed;
+    box.lives = 5;
+}
+function hanleMouseClick(evt){
+    if(showWinScreen){
+    reset()
+    scoreReset()
+    showWinScreen = false;
+
+    }
+        previosMaxScore = maxScore;
 }
 function draw(){
     colorRect(0,0,canvas.width,canvas.height,"black")
+    if (showWinScreen){
+        colorText("play",canvas.width/2 - 50,500,"40px Arial","white")
+        if (box.score < previosMaxScore){
+        colorText("score: " + box.score ,canvas.width/2 - 70,50,"30px Arial","red")
+        colorText("Max Score: " + maxScore,canvas.width/2 - 70,300,"32px Arial","darkRed")
+    }else if (box.score > previosMaxScore){
+        colorText("score: " + box.score ,canvas.width/2 - 70,50,"30px Arial","green")
+        colorText("Max Score: " + maxScore,canvas.width/2 - 70,300,"32px Arial","darkGreen")
+    }
+        return;
+    }
     colorCircle(ball.x,ball.y,ball.radios,ball.color)
-    colorRect(box.x - box.width/2,box.y - box.height/2,box.width,box.height,box.color)
-    colorText(box.score,20,50,"30px Arial","green")
+    colorCircle(ball_1.x,ball_1.y,ball_1.radios,ball_1.color)
+    colorRect(box.x ,box.y,box.width,box.height,box.color)
+    colorText("score: " + box.score,20,50,"30px Arial","green")
+    colorText("lives: " + box.lives,canvas.width - 100,50,"30px Arial","red")
 }
 function colorRect(x,y,width,height,color){
     ctx.fillStyle = color
@@ -99,10 +177,8 @@ function colorCircle (centerx,centery,radius,drawColor){
 	ctx.arc(centerx,centery,radius,0, Math.PI*2, true);
 	ctx.fill();
 }
-function colorText(text,x,y,font,color){
+function colorText( text,x,y,font,color){
     ctx.fillStyle = color
     ctx.font = font;
-	ctx.fillText("score: " + text,x,y);
-}</script>
-</body>
-</html>
+	ctx.fillText(text,x,y);
+}
