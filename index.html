@@ -35,16 +35,16 @@ var ball = {
     x:40,
     y:40,
     radios:12.5,
-    speed:5,
-    realSpeed:6,
+    speed:4,
+    realSpeed:5,
     color:"Olive",
 }
 var ball_1 = {
     x:70,
     y:-500,
     radios:12.5,
-    speed:5,
-    realSpeed:6,
+    speed:4,
+    realSpeed:5,
     color:"Olive",
 }
 function calculateMousePos(evt){
@@ -63,7 +63,7 @@ window.onload = function(){
     ctx = canvas.getContext('2d');
     ball.x = myNum(canvas.width -50) + 50
     ball_1.x = myNum(canvas.width -50) + 50
-    var fps = 60;
+    var fps = 80;
     setInterval (function (){
     move();
     draw()
@@ -109,9 +109,9 @@ function move(){
         }
     }
     if (mouseX < box.x){
-    box.x = mouseX + box.width/2
+    box.x -= 3
     } if (mouseX > box.x){
-    box.x = mouseX - box.width/2
+    box.x += 3
     }
 }
 }
@@ -160,7 +160,7 @@ function scoreReset(){
     ball.realSpeed = speed;
     ball_1.realSpeed = speed;
     ball_1.speed = speed;
-    box.lives = 5;
+    box.lives = 3;
 }
 function hanleMouseClick(evt){
     if(showWinScreen){
